@@ -1,0 +1,118 @@
+﻿@model OrderPurchaseSystem.ViewModels.OrderTakingEditForm
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit Order</h2>
+
+@using (Html.BeginForm("Edit", "Order"))
+{
+<div class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.PurchaseOrder.CustomerId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.PurchaseOrder.CustomerId, new SelectList(Model.Customers, "Id", "FullName"), "", new { @class = "form-control", name = "ddlCustomerId" })
+            @Html.ValidationMessageFor(model => model.PurchaseOrder.CustomerId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.PurchaseOrder.DateOfDelivery, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @*@Html.EditorFor(model => model.PurchaseOrder.DateOfDelivery, new { htmlAttributes = new { @class = "form-control", id = "date", autocomplete = "off" } })*@
+            @Html.TextBoxFor(model => model.PurchaseOrder.DateOfDelivery, "{0:d/M/yyyy}", new { @class = "form-control", id = "date", autocomplete = "off", name = "dPDateOfDelivery" })
+            @Html.ValidationMessageFor(model => model.PurchaseOrder.DateOfDelivery, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.PurchaseOrder.Status, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.PurchaseOrder.Status, new SelectList(Model.OrderStatuses, "Status", "Status"), "", new { @class = "form-control", name = "ddlOrderStatus" })
+            @Html.ValidationMessageFor(model => model.PurchaseOrder.Status, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <hr />
+
+    @Html.ActionLink("Add Item", "Create", "Items", null, new { @class = "btn btn-default"})
+    <h2>Items</h2>
+    @if (!Model.Items.Any())
+    {
+        <p>
+            <text>Customer has no order yet.</text>
+        </p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    
+                    <tr>
+                        <td>@item.SKU</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price</td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", "Items", new { id = item.PurchaseItemId }, null) |
+                            @Html.ActionLink("Delete", "Delete", "Items", new { id = item.PurchaseItemId }, null)
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    
+    <p style="text-align: right; font-weight: bold">
+        Amount Due: @Model.PurchaseOrder.AmountDue
+    </p>
+
+    @Html.HiddenFor(model => model.PurchaseOrder.Id)
+
+    <div class="form-group">
+        <div class="col-md-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+</div>
+}
+
+
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+
+    <script>
+        $(document).ready(function () {
+
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            $("#date").datepicker({
+                dateFormat: 'dd/m/yy',
+                currentText: 'Today',
+                gotoCurrent: true,
+                minDate: tomorrow,
+                stepMonths: 1
+            });
+
+        });
+    </script>
+}
